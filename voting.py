@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
 
 def calculate_borda_rankings_alternative(df):
     candidates = df.index.tolist()
@@ -21,7 +23,11 @@ def calculate_borda_rankings_alternative(df):
     return rankings
 
 def plot_results(rankings):
-    plt.rcParams['font.sans-serif'] = ['SimHei']  # Set the font to SimHei
+    fm.fontManager.addfont('TaipeiSansTCBeta-Regular.ttf')
+    mpl.rc('font', family='Taipei Sans TC Beta')
+    # mpl.font_manager.fontManager.addfont('SimHei.ttf') # 臨時註冊新的全局字體
+    # plt.rcParams['font.sans-serif']=['SimHei'] #用来正常顯示中文標籤
+    # plt.rcParams['axes.unicode_minus']=False #用来正常顯示負號
     # plt.rcParams['font.sans-serif'] = ['Noto Sans CJK TC']  # Specify the font to use    plt.rcParams['axes.unicode_minus'] = False  # Ensure minus signs are displayed correctly
 
     fig, ax = plt.subplots()
@@ -32,14 +38,23 @@ def plot_results(rankings):
     plt.xticks(rotation=45)
     return fig
 
-st.title('Borda Count Voting App')
+st.title('獎學金審議排序計算')
+st.header('Ranking base on Borda counting method')
+
+# display markdown
+# st.markdown("# 這是一個標題")
+
+st.text('用來方便計算投票排序結果')
 
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file, index_col='姓名')
-    st.write(df)
+    #highlight the min value
+    st.dataframe(df.style.highlight_min(axis=0))
+    # st.write(df)
     
+
     rankings = calculate_borda_rankings_alternative(df.iloc[:, 2:])  # exclude non-ranking columns
     
     st.subheader('Rankings')
